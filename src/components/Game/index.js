@@ -73,7 +73,7 @@ class Game extends React.Component {
       end:false,
       lock:false,
       win:null,
-      vsComp:false
+      vsComp:false,
     };
   }
 
@@ -228,7 +228,7 @@ class Game extends React.Component {
     let {turn} = this.state
     let i;
 
-      if (!this.state.end){
+      
         for (i = 0; i < 6; i++) {
           if (board[i][x] == "1" || board[i][x] == "2") {
             if (turn == 2){
@@ -262,7 +262,7 @@ class Game extends React.Component {
           turn
         });
         this.checkend()
-      }
+      
   }
   aiMove = event =>{
     let rand = Math.floor(Math.random() * 7);
@@ -318,9 +318,10 @@ class Game extends React.Component {
     }
 
   redrawBoard = event =>{
-    let {board,matRend,end,win} = this.state
+    let {board,matRend,end,win,turn} = this.state
     end = false
     win = null
+    turn = 1
     const {classes} = this.props
     let counter = 0
     for (let i = 0; i < 6; i++) {
@@ -411,14 +412,22 @@ class Game extends React.Component {
       }
     }
       this.setState({
-        board,end,win
+        board,end,win,turn
       })
     }
     
-  computerActive = event => {
+  computerActiveF = event => {
     this.redrawBoard()
     this.setState({
-      vsComp:true
+      vsComp:true,
+    })
+  }
+
+  computerActiveS = event => {
+    this.redrawBoard()
+    this.aiMove()
+    this.setState({
+      vsComp:true,
     })
   }
 
@@ -525,6 +534,7 @@ class Game extends React.Component {
     const { matRend } = this.state;
     let end = null
     let winner = null
+    
     if (this.state.win == 1){
       winner = "Player 1"
     }else if (this.state.win == 2){
@@ -595,7 +605,8 @@ class Game extends React.Component {
         </Grid>
         <div className={classes.playsetting}>
             <Button className={classes.button} onClick ={this.computerInactive} value={1} key={1}>vs Human</Button>
-            <Button className={classes.button} onClick ={this.computerActive} value={2} key={2}>vs Computer</Button>
+            <Button className={classes.button} onClick ={this.computerActiveF} value={2} key={2}>vs Computer (Go First)</Button>
+            <Button className={classes.button} onClick ={this.computerActiveS} value={2} key={2}>vs Computer (Go Second)</Button>
             <Button className={classes.button}>Computer vs Computer</Button>
         </div>
       </div>
