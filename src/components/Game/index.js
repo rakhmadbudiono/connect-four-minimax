@@ -227,17 +227,18 @@ class Game extends React.Component {
     const {classes} = this.props;
     let {turn} = this.state
     let i;
+
       if (!this.state.end){
         for (i = 0; i < 6; i++) {
           if (board[i][x] == "1" || board[i][x] == "2") {
             if (turn == 2){
               board[i - 1][x] = "1";
-              matRend[i-1][x] = (<Grid key={6*i+x} className={classes.yCircles} item />)
+              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
               turn = 2;
               break;
             }else if (turn == 1){
               board[i - 1][x] = "2";
-              matRend[i-1][x] = (<Grid key={6*i+x} className={classes.rCircles} item />)
+              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
               turn = 1;
               break;
             }
@@ -247,11 +248,11 @@ class Game extends React.Component {
         if (i == 6) {
           if (turn == 2){
             board[i - 1][x] = "1";
-            matRend[i-1][x] = (<Grid key={6*i+x} className={classes.yCircles} item />)
+            matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
             turn = 2;
           }else if (turn == 1){
             board[i - 1][x] = "2";
-            matRend[i-1][x] = (<Grid key={6*i+x} className={classes.rCircles} item />)
+            matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
             turn = 1;
           }
         }
@@ -270,6 +271,7 @@ class Game extends React.Component {
   }
   
   clickCol = event => {
+    console.log(event.target)
     const { board } = this.state;
     const {matRend} = this.state;
     const {classes} = this.props;
@@ -315,12 +317,122 @@ class Game extends React.Component {
       }
     }
 
+  redrawBoard = event =>{
+    let {board,matRend,end,win} = this.state
+    end = false
+    win = null
+    const {classes} = this.props
+    let counter = 0
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 7; j++) {
+        board[i][j] = "0"
+        counter += 1
+        let key = counter
+        console.log(key)
+        switch(j){         
+          case 0:
+            matRend[i][j] = (
+              <Grid key={key} className={classes.wCircles} item>
+                <Button
+                  className={classes.wCircles}
+                  onClick={this.clickCol}
+                  value={0}
+                />
+              </Grid>
+            );
+            break
+          case 1:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={1}
+              />
+            </Grid>
+          );
+          break
+          case 2:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={2}
+              />
+            </Grid>
+          );
+          break
+          case 3:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={3}
+              />
+            </Grid>
+          );
+          break
+          case 4:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={4}
+              />
+            </Grid>
+          );
+          break
+          case 5:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={5}
+              />
+            </Grid>
+          );
+          break
+          case 6:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={6}
+              />
+            </Grid>
+          );
+          break
+        }
+      }
+    }
+      this.setState({
+        board,end,win
+      })
+    }
+    
+  computerActive = event => {
+    this.redrawBoard()
+    this.setState({
+      vsComp:true
+    })
+  }
+
+  computerInactive = event => {
+    this.redrawBoard()
+    this.setState({
+      vsComp:false
+    })
+  }
 
   drawBoard = event => {
     const { classes } = this.props;
     let { matRend } = this.state;
     let { board } = this.state;
-    matRend = [[], [], [], [], [], []]
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 7; j++) {
         const key = 6 * i + j;
@@ -399,19 +511,8 @@ class Game extends React.Component {
         }
       }
     }
-    let comp = null
-    if (event != null){
-      if (event.target.getAttribute('value') == "computer"){
-        comp= true
-      }else{
-        comp = false
-      }
-    }else{
-      comp = false
-    }
     this.setState({
-      matRend,
-      vsComp:comp
+      matRend
     });
   };
 
@@ -493,8 +594,8 @@ class Game extends React.Component {
           </Grid>
         </Grid>
         <div className={classes.playsetting}>
-            <Button className={classes.button} onClick={this.drawBoard} value="human">vs Human</Button>
-            <Button className={classes.button} onClick={this.drawBoard} value="computer">vs Computer</Button>
+            <Button className={classes.button} onClick ={this.computerInactive} value={1} key={1}>vs Human</Button>
+            <Button className={classes.button} onClick ={this.computerActive} value={2} key={2}>vs Computer</Button>
             <Button className={classes.button}>Computer vs Computer</Button>
         </div>
       </div>
