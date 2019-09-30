@@ -79,6 +79,7 @@ class Game extends React.Component {
 
   directionCheck(x,y,n,direct){
     const {board} = this.state
+
     if (n == 3){
       if (board[x][y] == '1'){
         this.setState({
@@ -232,6 +233,7 @@ class Game extends React.Component {
         end:true,
         win:3
       })
+      return
     }
     return;
   }
@@ -271,6 +273,7 @@ class Game extends React.Component {
         end:true,
         win:3
       })
+      return 1
     }
     return 0;
   }
