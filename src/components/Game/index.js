@@ -6,7 +6,7 @@ const { minimax } = require("../../engine/minimax/index");
 
 const styles = {
   root: {
-    maxWidth: "800px",
+    maxWidth: "700px",
     margin: "20px auto 20px auto",
     backgroundColor: "blue",
     borderRadius:"10px",
@@ -14,20 +14,20 @@ const styles = {
   wCircles: {
     backgroundColor: "white",
     borderRadius: "50%",
-    minWidth: "100px",
-    minHeight: "100px"
+    minWidth: "60px",
+    minHeight: "60px"
   },
   rCircles: {
     backgroundColor: "red",
     borderRadius: "50%",
-    minWidth: "100px",
-    minHeight: "100px"
+    minWidth: "60px",
+    minHeight: "60px"
   },
   yCircles: {
     backgroundColor: "yellow",
     borderRadius: "50%",
-    minWidth: "100px",
-    minHeight: "100px"
+    minWidth: "60px",
+    minHeight: "60px"
   },
   row: {
     margin: "10px"
@@ -37,14 +37,13 @@ const styles = {
     fontSize:"32px"
   },
   playsetting:{
-    display:"flex",
-    flexDirection:"row",
-    maxWidth:"600px",
+    maxWidth:"1000px",
     margin:"auto"
   },
   button:{
     margin:"8px",
     backgroundColor:"grey",
+    padding: "20px",
     color:"white",
     '&:hover':{
       backgroundColor:"grey"
@@ -74,6 +73,7 @@ class Game extends React.Component {
       lock:false,
       win:null,
       vsComp:false,
+      vsCleverComp:false
     };
   }
 
@@ -373,11 +373,15 @@ class Game extends React.Component {
   aiMoveClever = (x,y) =>{
     const {board} = this.state
     let obj = minimax(board, 18, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false)
-    y['truth'] = true
+    if (y != null){
+      y['truth'] = true
+    }
     for (let i = 0; i < 7; i++){
-      if (board[0][i] == "0"){
-        y['truth'] = false
-        break
+      if (y != null){
+        if (board[0][i] == "0"){
+          y['truth'] = false
+          break
+        }
       }
     }
     if (x === "pvc"){
@@ -429,6 +433,8 @@ class Game extends React.Component {
         this.checkend()
         if (this.state.vsComp){
           this.aiMove("pvc")
+        }else if (this.state.vsCleverComp){
+          this.aiMoveClever("pvc")
         }
       }
     }
@@ -566,6 +572,39 @@ class Game extends React.Component {
       end = this.checkendSync()
     }
   }
+  randomVsai = event =>{
+    this.redrawBoard()
+    let y = {truth:false}
+    let end = false
+    while (!y['truth'] && !end){
+      this.aiMove("pvc", y)
+      this.aiMoveClever("cvc", y)
+      end = this.checkendSync()
+    }
+  }
+  aiVsai = event =>{
+    this.redrawBoard()
+    let y = {truth:false}
+    let end = false
+    while (!y['truth'] && !end){
+      this.aiMoveClever("pvc", y)
+      this.aiMoveClever("cvc", y)
+      end = this.checkendSync()
+    }
+  }
+  aiVshuman = event =>{
+    this.redrawBoard()
+    this.aiMoveClever("pvc")
+    this.setState({
+      vsCleverComp:true,
+    })
+  }
+  humanVsai = event =>{
+    this.redrawBoard()
+    this.setState({
+      vsCleverComp:true,
+    })
+  }
   computerInactive = event => {
     this.redrawBoard()
     this.setState({
@@ -678,7 +717,7 @@ class Game extends React.Component {
       winner = "Permainan seri!"
     }
     if (this.state.end){
-      end = <h1> Game End! Winner is {winner}</h1>
+      end = <h2> Game End! Winner is {winner}</h2>
     }else{
       end = null;
     }
@@ -740,13 +779,17 @@ class Game extends React.Component {
             {matRend[5]}
           </Grid>
         </Grid>
-        <div className={classes.playsetting}>
+        <Grid container direction="row" justify="space-evenly" className={classes.playsetting}>
             <Button className={classes.button} onClick ={this.computerInactive} value={1} key={1}>vs Human</Button>
             <Button className={classes.button} onClick ={this.computerActiveF} value={2} key={2}>vs Computer (Go First)</Button>
             <Button className={classes.button} onClick ={this.computerActiveS} value={2} key={2}>vs Computer (Go Second)</Button>
             <Button className={classes.button} onClick = {this.randomVsrandom}>Random vs Random</Button>
             <Button className={classes.button} onClick = {this.aiVsrandom}>AI (first) vs Random</Button>
-        </div>
+            <Button className={classes.button} onClick = {this.randomVsai}>AI vs Random (first)</Button>
+            <Button className={classes.button} onClick = {this.aiVsai}>AI vs AI</Button>
+            <Button className={classes.button} onClick = {this.aiVshuman}>AI (first) vs Human</Button>
+            <Button className={classes.button} onClick = {this.humanVsai}>AI vs Human (first)</Button>
+        </Grid>
       </div>
     );
   }
