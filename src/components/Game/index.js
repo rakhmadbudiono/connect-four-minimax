@@ -218,9 +218,63 @@ class Game extends React.Component {
           }
       }
     }
+    let finish = true
+    const {board} = this.state
+    for (let i = 0; i < 6; i++){
+        if (board[i][0] == "0"){
+          finish = false
+          break
+        }
+    }
+    if (finish){
+      this.setState({
+        end:true,
+        win:3
+      })
+    }
     return;
   }
-  adversarialMove = x => {
+
+  checkendSync = event =>{
+    for (let i = 0; i < 6; i++){
+      for (let j = 0; j < 7; j++){
+          if (this.directionCheck(i,j,0,'u') != 0){
+            return 1;
+          }else if (this.directionCheck(i,j,0,'d') != 0){
+            return 1;
+          }else if (this.directionCheck(i,j,0,'r') != 0){
+            return 1;
+          }else if (this.directionCheck(i,j,0,'l') != 0){
+            return 1;
+          }else if (this.directionCheck(i,j,0,'rh') != 0){
+            return 1;
+          }else if (this.directionCheck(i,j,0,'lh') != 0){
+            return 1;
+          }else if (this.directionCheck(i,j,0,'ll') != 0){
+            return 1;
+          }else if (this.directionCheck(i,j,0,'rl') != 0){
+            return 1;
+          }
+      }
+    }
+    let finish = true
+    const {board} = this.state
+    for (let i = 0; i < 6; i++){
+        if (board[i][0] == "0"){
+          finish = false
+          break
+        }
+    }
+    if (finish){
+      this.setState({
+        end:true,
+        win:3
+      })
+    }
+    return 0;
+  }
+  
+  adversarialMove = (x,y) => {
     const { board } = this.state;
     const {matRend} = this.state;
     const {classes} = this.props;
@@ -229,16 +283,30 @@ class Game extends React.Component {
 
       
         for (i = 0; i < 6; i++) {
+          console.log(i)
+          console.log(board)
           if (board[i][x] == "1" || board[i][x] == "2") {
             if (turn == 2){
-              board[i - 1][x] = "1";
-              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
-              turn = 2;
+              if (y == "pvc"){
+                board[i - 1][x] = "2";
+                matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
+                turn = 1;
+              }else if (y == "cvc"){
+                board[i - 1][x] = "1";
+                matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
+                turn = 1;
+              }
               break;
             }else if (turn == 1){
-              board[i - 1][x] = "2";
-              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
-              turn = 1;
+              if (y == "pvc"){
+                board[i - 1][x] = "2";
+                matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
+                turn = 1;
+              }else if (y == "cvc"){
+                board[i - 1][x] = "1";
+                matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
+                turn = 1;
+              }
               break;
             }
           }
@@ -246,13 +314,25 @@ class Game extends React.Component {
 
         if (i == 6) {
           if (turn == 2){
-            board[i - 1][x] = "1";
-            matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
-            turn = 2;
+            if (y == "pvc"){
+              board[i - 1][x] = "2";
+              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
+              turn = 1;
+            }else if (y == "cvc"){
+              board[i - 1][x] = "1";
+              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
+              turn = 1;
+            }
           }else if (turn == 1){
-            board[i - 1][x] = "2";
-            matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
-            turn = 1;
+            if (y == "pvc"){
+              board[i - 1][x] = "2";
+              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
+              turn = 1;
+            }else if (y == "cvc"){
+              board[i - 1][x] = "1";
+              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
+              turn = 1;
+            }
           }
         }
         this.setState({
@@ -263,14 +343,28 @@ class Game extends React.Component {
         this.checkend()
       
   }
-  aiMove = event =>{
-    let rand = Math.floor(Math.random() * 7);
-    console.log(rand)
-    this.adversarialMove(rand)
+  aiMove = (x,y) =>{
+    const {board} = this.state
+    let validmoves = []
+    for (let i = 0; i < 7; i++){
+      if (board[0][i] == "0"){
+        validmoves.push(i)
+      }
+    }
+    let rand = Math.floor(Math.random() * validmoves.length);
+    if (validmoves.length == 0){
+      y['truth'] = true
+    }
+    if (validmoves.length != 0){
+      if (x == "pvc"){
+        this.adversarialMove(validmoves[rand],"pvc")
+      }else if (x === "cvc"){
+        this.adversarialMove(validmoves[rand],"cvc")
+      }
+    }
   }
   
   clickCol = event => {
-    console.log(event.target)
     const { board } = this.state;
     const {matRend} = this.state;
     const {classes} = this.props;
@@ -311,7 +405,7 @@ class Game extends React.Component {
         });
         this.checkend()
         if (this.state.vsComp){
-          this.aiMove()
+          this.aiMove("pvc")
         }
       }
     }
@@ -424,12 +518,22 @@ class Game extends React.Component {
 
   computerActiveS = event => {
     this.redrawBoard()
-    this.aiMove()
+    this.aiMove("pvc")
     this.setState({
       vsComp:true,
     })
   }
 
+  computerVscomputer = event =>{
+    this.redrawBoard()
+    let y = {truth:false}
+    let end = false
+    while (!y['truth'] && !end){
+      this.aiMove("pvc",y)
+      this.aiMove("cvc",y)
+      end = this.checkendSync()
+    }
+  }
   computerInactive = event => {
     this.redrawBoard()
     this.setState({
@@ -538,6 +642,8 @@ class Game extends React.Component {
       winner = "Player 1"
     }else if (this.state.win == 2){
       winner = "Player 2"
+    }else if (this.state.win == 3){
+      winner = "Permainan seri!"
     }
     if (this.state.end){
       end = <h1> Game End! Winner is {winner}</h1>
@@ -606,7 +712,7 @@ class Game extends React.Component {
             <Button className={classes.button} onClick ={this.computerInactive} value={1} key={1}>vs Human</Button>
             <Button className={classes.button} onClick ={this.computerActiveF} value={2} key={2}>vs Computer (Go First)</Button>
             <Button className={classes.button} onClick ={this.computerActiveS} value={2} key={2}>vs Computer (Go Second)</Button>
-            <Button className={classes.button}>Computer vs Computer</Button>
+            <Button className={classes.button} onClick = {this.computerVscomputer}>Computer vs Computer</Button>
         </div>
       </div>
     );
