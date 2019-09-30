@@ -1,4 +1,3 @@
-const app = require("../../App");
 const util = require("util");
 const { evaluate } = require("evaluate");
 
@@ -8,8 +7,6 @@ const { evaluate } = require("evaluate");
         move: 4
     }
 */
-
-const currentState = app.getCurrentState();
 
 function max(states, depth, alpha, beta) {
     let score = -9999;
