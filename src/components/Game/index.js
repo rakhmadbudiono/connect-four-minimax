@@ -2,10 +2,11 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
+import { flexbox } from "@material-ui/system";
 
 const styles = {
   root: {
-    maxWidth: "1000px",
+    maxWidth: "800px",
     margin: "20px auto 20px auto",
     backgroundColor: "blue",
     borderRadius:"10px",
@@ -13,23 +14,44 @@ const styles = {
   wCircles: {
     backgroundColor: "white",
     borderRadius: "50%",
-    minWidth: "110px",
+    minWidth: "100px",
     minHeight: "100px"
   },
   rCircles: {
     backgroundColor: "red",
     borderRadius: "50%",
-    minWidth: "110px",
+    minWidth: "100px",
     minHeight: "100px"
   },
   yCircles: {
     backgroundColor: "yellow",
     borderRadius: "50%",
-    minWidth: "110px",
+    minWidth: "100px",
     minHeight: "100px"
   },
   row: {
     margin: "10px"
+  },
+  title:{
+    textAlign:"center",
+    fontSize:"32px"
+  },
+  playsetting:{
+    display:"flex",
+    flexDirection:"row",
+    maxWidth:"600px",
+    margin:"auto"
+  },
+  button:{
+    margin:"8px",
+    backgroundColor:"grey",
+    color:"white",
+    '&:hover':{
+      backgroundColor:"grey"
+    },
+    '&:active':{
+      backgroundColor:"grey"
+    }
   }
 };
 
@@ -48,7 +70,10 @@ class Game extends React.Component {
       board: matStat,
       matRend: [[], [], [], [], [], []],
       turn: 1,
-      win:false
+      end:false,
+      lock:false,
+      win:null,
+      vsComp:false,
     };
   }
 
@@ -56,8 +81,14 @@ class Game extends React.Component {
     const {board} = this.state
     if (n == 3){
       if (board[x][y] == '1'){
+        this.setState({
+          win:1
+        })
         return 1
       }else if (board[x][y] == '2'){
+        this.setState({
+          win:2
+        })
         return 2
       }
       
@@ -142,70 +173,72 @@ class Game extends React.Component {
         return 0;
     }
   }
-  checkWin = () =>{
+  checkend = event =>{
     for (let i = 0; i < 6; i++){
       for (let j = 0; j < 7; j++){
           if (this.directionCheck(i,j,0,'u') != 0){
             this.setState({
-              win:true
+              end:true
             })
             return;
           }else if (this.directionCheck(i,j,0,'d') != 0){
             this.setState({
-              win:true
+              end:true
             })
             return;
           }else if (this.directionCheck(i,j,0,'r') != 0){
             this.setState({
-              win:true
+              end:true
             })
             return;
           }else if (this.directionCheck(i,j,0,'l') != 0){
             this.setState({
-              win:true
+              end:true
             })
             return;
           }else if (this.directionCheck(i,j,0,'rh') != 0){
             this.setState({
-              win:true
+              end:true
             })
             return;
           }else if (this.directionCheck(i,j,0,'lh') != 0){
             this.setState({
-              win:true
+              end:true
             })
             return;
           }else if (this.directionCheck(i,j,0,'ll') != 0){
             this.setState({
-              win:true
+              end:true
             })
             return;
           }else if (this.directionCheck(i,j,0,'rl') != 0){
             this.setState({
-              win:true
+              end:true
             })
             return;
           }
       }
     }
+    return;
   }
-  clickFirstCol = () => {
+  adversarialMove = x => {
     const { board } = this.state;
     const {matRend} = this.state;
     const {classes} = this.props;
     let {turn} = this.state
     let i;
-      if (!this.state.win){
+
+      
         for (i = 0; i < 6; i++) {
-          if (board[i][0] == "1" || board[i][0] == "2") {
-            if (turn == 1){
-              board[i - 1][0] = "1";
-              matRend[i-1][0] = (<Grid key={6*i} className={classes.yCircles} item />)
+          if (board[i][x] == "1" || board[i][x] == "2") {
+            if (turn == 2){
+              board[i - 1][x] = "1";
+              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
               turn = 2;
               break;
-            }else if (turn == 2){
-              board[i - 1][0] = "2";
-              matRend[i-1][0] = (<Grid key={6*i} className={classes.rCircles} item />)
+            }else if (turn == 1){
+              board[i - 1][x] = "2";
+              matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
               turn = 1;
               break;
             }
@@ -213,13 +246,13 @@ class Game extends React.Component {
         }
 
         if (i == 6) {
-          if (turn == 1){
-            board[i - 1][0] = "1";
-            matRend[i-1][0] = (<Grid key={6*i} className={classes.yCircles} item />)
+          if (turn == 2){
+            board[i - 1][x] = "1";
+            matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.yCircles} item />)
             turn = 2;
-          }else if (turn == 2){
-            board[i - 1][0] = "2";
-            matRend[i-1][0] = (<Grid key={6*i} className={classes.rCircles} item />)
+          }else if (turn == 1){
+            board[i - 1][x] = "2";
+            matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
             turn = 1;
           }
         }
@@ -228,257 +261,187 @@ class Game extends React.Component {
           matRend,
           turn
         });
-        this.checkWin()
-      }
-  };
-
-  clickSecondCol = () => {
+        this.checkend()
+      
+  }
+  aiMove = event =>{
+    let rand = Math.floor(Math.random() * 7);
+    console.log(rand)
+    this.adversarialMove(rand)
+  }
+  
+  clickCol = event => {
+    console.log(event.target)
     const { board } = this.state;
     const {matRend} = this.state;
     const {classes} = this.props;
     let {turn} = this.state
     let i;
-    if (!this.state.win){
-    for (i = 0; i < 6; i++) {
-      if (board[i][1] == "1" || board[i][1] == "2") {
-        if (turn == 1){
-          board[i - 1][1] = "1";
-          matRend[i-1][1] = (<Grid key={6*i+1} className={classes.yCircles} item />)
-          turn = 2;
-          break;
-        }else if (turn == 2){
-          board[i - 1][1] = "2";
-          matRend[i-1][1] = (<Grid key={6*i+1} className={classes.rCircles} item />)
-          turn = 1;
-          break;
+      if (!this.state.end){
+        for (i = 0; i < 6; i++) {
+          if (board[i][event.target.getAttribute('value')] == "1" || board[i][event.target.getAttribute('value')] == "2") {
+            if (turn == 1){
+              board[i - 1][event.target.getAttribute('value')] = "1";
+              matRend[i-1][event.target.getAttribute('value')] = (<Grid key={6*i+event.target.getAttribute('value')} className={classes.yCircles} item />)
+              turn = 2;
+              break;
+            }else if (turn == 2){
+              board[i - 1][event.target.getAttribute('value')] = "2";
+              matRend[i-1][event.target.getAttribute('value')] = (<Grid key={6*i+event.target.getAttribute('value')} className={classes.rCircles} item />)
+              turn = 1;
+              break;
+            }
+          }
+        }
+
+        if (i == 6) {
+          if (turn == 1){
+            board[i - 1][event.target.getAttribute('value')] = "1";
+            matRend[i-1][event.target.getAttribute('value')] = (<Grid key={6*i+event.target.getAttribute('value')} className={classes.yCircles} item />)
+            turn = 2;
+          }else if (turn == 2){
+            board[i - 1][event.target.getAttribute('value')] = "2";
+            matRend[i-1][event.target.getAttribute('value')] = (<Grid key={6*i+event.target.getAttribute('value')} className={classes.rCircles} item />)
+            turn = 1;
+          }
+        }
+        this.setState({
+          board,
+          matRend,
+          turn
+        });
+        this.checkend()
+        if (this.state.vsComp){
+          this.aiMove()
         }
       }
     }
-    if (i == 6) {
-      if (turn == 1){
-        board[i - 1][1] = "1";
-        matRend[i-1][1] = (<Grid key={6*i+1} className={classes.yCircles} item />)
-        turn = 2;
-      }else if (turn == 2){
-        board[i - 1][1] = "2";
-        matRend[i-1][1] = (<Grid key={6*i+1} className={classes.rCircles} item />)
-        turn = 1;
+
+  redrawBoard = event =>{
+    let {board,matRend,end,win,turn} = this.state
+    end = false
+    win = null
+    turn = 1
+    const {classes} = this.props
+    let counter = 0
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 7; j++) {
+        board[i][j] = "0"
+        counter += 1
+        let key = counter
+        console.log(key)
+        switch(j){         
+          case 0:
+            matRend[i][j] = (
+              <Grid key={key} className={classes.wCircles} item>
+                <Button
+                  className={classes.wCircles}
+                  onClick={this.clickCol}
+                  value={0}
+                />
+              </Grid>
+            );
+            break
+          case 1:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={1}
+              />
+            </Grid>
+          );
+          break
+          case 2:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={2}
+              />
+            </Grid>
+          );
+          break
+          case 3:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={3}
+              />
+            </Grid>
+          );
+          break
+          case 4:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={4}
+              />
+            </Grid>
+          );
+          break
+          case 5:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={5}
+              />
+            </Grid>
+          );
+          break
+          case 6:
+          matRend[i][j] = (
+            <Grid key={key} className={classes.wCircles} item>
+              <Button
+                className={classes.wCircles}
+                onClick={this.clickCol}
+                value={6}
+              />
+            </Grid>
+          );
+          break
+        }
       }
     }
+      this.setState({
+        board,end,win,turn
+      })
+    }
+    
+  computerActiveF = event => {
+    this.redrawBoard()
     this.setState({
-      board,
-      matRend,turn
-    });
-    this.checkWin()
+      vsComp:true,
+    })
   }
-  };
 
-  clickThirdCol = () => {
-    const { board } = this.state;
-    const {matRend} = this.state;
-    const {classes} = this.props;
-    let {turn} = this.state;
-    let i;
-    if (!this.state.win){
-      for (i = 0; i < 6; i++) {
-        if (board[i][2] == "1" || board[i][2] == "2") {
-          if (turn == 1){
-            board[i - 1][2] = "1";
-            matRend[i-1][2] = (<Grid key={6*i+2} className={classes.yCircles} item />)
-            turn = 2;
-            break;
-          }else if (turn == 2){
-            board[i - 1][2] = "2";
-            matRend[i-1][2] = (<Grid key={6*i+2} className={classes.rCircles} item />)
-            turn = 1;
-            break;
-          }
-        }
-      }
-      if (i == 6) {
-        if (turn == 1){
-          board[i - 1][2] = "1";
-          matRend[i-1][2] = (<Grid key={6*i+2} className={classes.yCircles} item />)
-          turn = 2;
-        }else if (turn == 2){
-          board[i - 1][2] = "2";
-          matRend[i-1][2] = (<Grid key={6*i+2} className={classes.rCircles} item />)
-          turn = 1;
-        }
-      }
-      this.setState({
-        board,matRend,turn
-      });
-      this.checkWin()
-    }
-  };
+  computerActiveS = event => {
+    this.redrawBoard()
+    this.aiMove()
+    this.setState({
+      vsComp:true,
+    })
+  }
 
-  clickFourthCol = () => {
-    const { board } = this.state;
-    const {classes} = this.props;
-    let {turn} = this.state;
-    const {matRend} = this.state
-    let i;
-    if (!this.state.win){
-      for (i = 0; i < 6; i++) {
-        if (board[i][3] == "1" || board[i][3] == "2") {
-          if (turn == 1){
-            board[i - 1][3] = "1";
-            matRend[i-1][3] = (<Grid key={6*i+3} className={classes.yCircles} item />)
-            turn = 2;
-            break;
-          }else if (turn == 2){
-            board[i - 1][3] = "2";
-            matRend[i-1][3] = (<Grid key={6*i+3} className={classes.rCircles} item />)
-            turn = 1;
-            break;
-          }
-        }
-      }
-      if (i == 6) {
-        if (turn == 1){
-          board[i - 1][3] = "1";
-          matRend[i-1][3] = (<Grid key={6*i+3} className={classes.yCircles} item />)
-          turn = 2;
-        }else if (turn == 2){
-          board[i - 1][3] = "2";
-          matRend[i-1][3] = (<Grid key={6*i+3} className={classes.rCircles} item />)
-          turn = 1;
-        }
-      }
-      this.setState({
-        board,matRend,turn
-      });
-      this.checkWin()
-    }
-  };
+  computerInactive = event => {
+    this.redrawBoard()
+    this.setState({
+      vsComp:false
+    })
+  }
 
-  clickFifthCol = () => {
-    const { board } = this.state;
-    const {classes} = this.props;
-    let {turn} = this.state;
-    const {matRend} = this.state;
-    let i;
-    if (!this.state.win){
-      for (i = 0; i < 6; i++) {
-        if (board[i][4] == "1" || board[i][4] == "2") {
-          if (turn == 1){
-            board[i - 1][4] = "1";
-            matRend[i-1][4] = (<Grid key={6*i+4} className={classes.yCircles} item />)
-            turn = 2;
-            break;
-          }else if (turn == 2){
-            board[i - 1][4] = "2";
-            matRend[i-1][4] = (<Grid key={6*i+4} className={classes.rCircles} item />)
-            turn = 1;
-            break;
-          }
-        }
-      }
-      if (i == 6) {
-        if (turn == 1){
-          board[i - 1][4] = "1";
-          matRend[i-1][4] = (<Grid key={6*i+4} className={classes.yCircles} item />)
-          turn = 2;
-        }else if (turn == 2){
-          board[i - 1][4] = "2";
-          matRend[i-1][4] = (<Grid key={6*i+4} className={classes.rCircles} item />)
-          turn = 1;
-        }
-      }
-      console.log(board);
-      this.setState({
-        board,matRend,turn
-      });
-      this.checkWin()
-    }
-  };
-
-  clickSixthCol = () => {
-    const { board } = this.state;
-    const {classes} = this.props;
-    let {turn} = this.state;
-    const {matRend} = this.state;
-    let i;
-    if (!this.state.win){
-      for (i = 0; i < 6; i++) {
-        if (board[i][5] == "1" || board[i][5] == "2") {
-          if (turn == 1){
-            board[i - 1][5] = "1";
-            matRend[i-1][5] = (<Grid key={6*i+5} className={classes.yCircles} item />)
-            turn = 2;
-            break;
-          }else if (turn == 2){
-            board[i - 1][5] = "2";
-            matRend[i-1][5] = (<Grid key={6*i+5} className={classes.rCircles} item />)
-            turn = 1;
-            break;
-          }
-        }
-      }
-      if (i == 6) {
-        if (turn == 1){
-          board[i - 1][5] = "1";
-          matRend[i-1][5] = (<Grid key={6*i+5} className={classes.yCircles} item />)
-          turn = 2;
-        }else if (turn == 2){
-          board[i - 1][5] = "2";
-          matRend[i-1][5] = (<Grid key={6*i+5} className={classes.rCircles} item />)
-          turn = 1;
-        }
-      }
-      this.setState({
-        board,matRend,turn
-      });
-      this.checkWin()
-    }
-  };
-
-  clickSeventhCol = () => {
-    const { board } = this.state;
-    const {classes} = this.props;
-    let {turn} = this.state;
-    const {matRend} = this.state;
-    let i;
-    if (!this.state.win){
-      for (i = 0; i < 6; i++) {
-        if (board[i][6] == "1" || board[i][6] == "2") {
-          if (turn == 1){
-            board[i - 1][6] = "1";
-            matRend[i-1][6] = (<Grid key={6*i+6} className={classes.yCircles} item />)
-            turn = 2;
-            break;
-          }else if (turn == 2){
-            board[i - 1][6] = "2";
-            matRend[i-1][6] = (<Grid key={6*i+6} className={classes.rCircles} item />)
-            turn = 1;
-            break;
-          }
-        }
-      }
-      if (i == 6) {
-        if (turn == 1){
-          board[i - 1][6] = "1";
-          matRend[i-1][6] = (<Grid key={6*i+6} className={classes.yCircles} item />)
-          turn = 2;
-        }else if (turn == 2){
-          board[i - 1][6] = "2";
-          matRend[i-1][6] = (<Grid key={6*i+6} className={classes.rCircles} item />)
-          turn = 1;
-        }
-      }
-      this.setState({
-        board,matRend,turn
-      });
-      this.checkWin()
-    }
-
-  };
-
-  drawBoard = () => {
+  drawBoard = event => {
     const { classes } = this.props;
-    const { matRend } = this.state;
-    const { board } = this.state;
+    let { matRend } = this.state;
+    let { board } = this.state;
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 7; j++) {
         const key = 6 * i + j;
@@ -488,7 +451,8 @@ class Game extends React.Component {
               <Grid key={key} className={classes.wCircles} item>
                 <Button
                   className={classes.wCircles}
-                  onClick={this.clickFirstCol}
+                  onClick={this.clickCol}
+                  value={0}
                 />
               </Grid>
             );
@@ -497,7 +461,8 @@ class Game extends React.Component {
               <Grid key={key} className={classes.wCircles} item>
                 <Button
                   className={classes.wCircles}
-                  onClick={this.clickSecondCol}
+                  onClick={this.clickCol}
+                  value={1}
                 />
               </Grid>
             );
@@ -506,7 +471,8 @@ class Game extends React.Component {
               <Grid key={key} className={classes.wCircles} item>
                 <Button
                   className={classes.wCircles}
-                  onClick={this.clickThirdCol}
+                  onClick={this.clickCol}
+                  value={2}
                 />
               </Grid>
             );
@@ -515,7 +481,8 @@ class Game extends React.Component {
               <Grid key={key} className={classes.wCircles} item>
                 <Button
                   className={classes.wCircles}
-                  onClick={this.clickFourthCol}
+                  onClick={this.clickCol}
+                  value={3}
                 />
               </Grid>
             );
@@ -524,7 +491,8 @@ class Game extends React.Component {
               <Grid key={key} className={classes.wCircles} item>
                 <Button
                   className={classes.wCircles}
-                  onClick={this.clickFifthCol}
+                  onClick={this.clickCol}
+                  value={4}
                 />
               </Grid>
             );
@@ -533,7 +501,8 @@ class Game extends React.Component {
               <Grid key={key} className={classes.wCircles} item>
                 <Button
                   className={classes.wCircles}
-                  onClick={this.clickSixthCol}
+                  onClick={this.clickCol}
+                  value={5}
                 />
               </Grid>
             );
@@ -542,7 +511,8 @@ class Game extends React.Component {
               <Grid key={key} className={classes.wCircles} item>
                 <Button
                   className={classes.wCircles}
-                  onClick={this.clickSeventhCol}
+                  onClick={this.clickCol}
+                  value={6}
                 />
               </Grid>
             );
@@ -562,8 +532,27 @@ class Game extends React.Component {
   render() {
     const { classes } = this.props;
     const { matRend } = this.state;
+    let end = null
+    let winner = null
+    
+    if (this.state.win == 1){
+      winner = "Player 1"
+    }else if (this.state.win == 2){
+      winner = "Player 2"
+    }
+    if (this.state.end){
+      end = <h1> Game End! Winner is {winner}</h1>
+    }else{
+      end = null;
+    }
     return (
       <div>
+        <div className={classes.title}>
+          Connect 4
+        </div>
+        <div className={classes.title}>
+        {end}
+        </div>
         <Grid container className={classes.root} justify="space-between">
           <Grid
             container
@@ -614,6 +603,12 @@ class Game extends React.Component {
             {matRend[5]}
           </Grid>
         </Grid>
+        <div className={classes.playsetting}>
+            <Button className={classes.button} onClick ={this.computerInactive} value={1} key={1}>vs Human</Button>
+            <Button className={classes.button} onClick ={this.computerActiveF} value={2} key={2}>vs Computer (Go First)</Button>
+            <Button className={classes.button} onClick ={this.computerActiveS} value={2} key={2}>vs Computer (Go Second)</Button>
+            <Button className={classes.button}>Computer vs Computer</Button>
+        </div>
       </div>
     );
   }
