@@ -78,6 +78,7 @@ class Game extends React.Component {
 
   directionCheck(x,y,n,direct){
     const {board} = this.state
+
     if (n == 3){
       if (board[x][y] == '1'){
         this.setState({
@@ -231,6 +232,7 @@ class Game extends React.Component {
         end:true,
         win:3
       })
+      return
     }
     return;
   }
@@ -270,6 +272,7 @@ class Game extends React.Component {
         end:true,
         win:3
       })
+      return 1
     }
     return 0;
   }
@@ -281,10 +284,8 @@ class Game extends React.Component {
     let {turn} = this.state
     let i;
 
-      
+      if (this.checkendSync() == 0){
         for (i = 0; i < 6; i++) {
-          console.log(i)
-          console.log(board)
           if (board[i][x] == "1" || board[i][x] == "2") {
             if (turn == 2){
               if (y == "pvc"){
@@ -341,7 +342,7 @@ class Game extends React.Component {
           turn
         });
         this.checkend()
-      
+      }
   }
   aiMove = (x,y) =>{
     const {board} = this.state
