@@ -285,10 +285,8 @@ class Game extends React.Component {
     let {turn} = this.state
     let i;
 
-      
+      if (this.checkendSync() == 0){
         for (i = 0; i < 6; i++) {
-          console.log(i)
-          console.log(board)
           if (board[i][x] == "1" || board[i][x] == "2") {
             if (turn == 2){
               if (y == "pvc"){
@@ -345,7 +343,7 @@ class Game extends React.Component {
           turn
         });
         this.checkend()
-      
+      }
   }
   aiMove = (x,y) =>{
     const {board} = this.state
