@@ -2,7 +2,7 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
-import { flexbox } from "@material-ui/system";
+const { minimax } = require("../../engine/minimax/index");
 
 const styles = {
   root: {
@@ -223,7 +223,7 @@ class Game extends React.Component {
     let finish = true
     const {board} = this.state
     for (let i = 0; i < 6; i++){
-        if (board[i][0] == "0"){
+        if (board[0][i] == "0"){
           finish = false
           break
         }
@@ -263,7 +263,7 @@ class Game extends React.Component {
     let finish = true
     const {board} = this.state
     for (let i = 0; i < 6; i++){
-        if (board[i][0] == "0"){
+        if (board[0][i] == "0"){
           finish = false
           break
         }
@@ -284,7 +284,9 @@ class Game extends React.Component {
     const {classes} = this.props;
     let {turn} = this.state
     let i;
-
+    console.log(minimax(board, 18, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false))
+    console.log(board)
+    
       if (this.checkendSync() == 0){
         for (i = 0; i < 6; i++) {
           if (board[i][x] == "1" || board[i][x] == "2") {
@@ -301,6 +303,8 @@ class Game extends React.Component {
               break;
             }else if (turn == 1){
               if (y == "pvc"){
+                console.log(i)
+                console.log(x)
                 board[i - 1][x] = "2";
                 matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
                 turn = 1;
@@ -365,6 +369,23 @@ class Game extends React.Component {
       }
     }
   }
+
+  aiMoveClever = (x,y) =>{
+    const {board} = this.state
+    let obj = minimax(board, 18, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false)
+    y['truth'] = true
+    for (let i = 0; i < 7; i++){
+      if (board[0][i] == "0"){
+        y['truth'] = false
+        break
+      }
+    }
+    if (x === "pvc"){
+      this.adversarialMove(obj['move'], "pvc")
+    }else if (x === "cvc"){
+      this.adversarialMove(obj['move'], "cvc")
+    }
+  }
   
   clickCol = event => {
     const { board } = this.state;
@@ -424,7 +445,6 @@ class Game extends React.Component {
         board[i][j] = "0"
         counter += 1
         let key = counter
-        console.log(key)
         switch(j){         
           case 0:
             matRend[i][j] = (
@@ -526,13 +546,23 @@ class Game extends React.Component {
     })
   }
 
-  computerVscomputer = event =>{
+  randomVsrandom = event =>{
     this.redrawBoard()
     let y = {truth:false}
     let end = false
     while (!y['truth'] && !end){
       this.aiMove("pvc",y)
       this.aiMove("cvc",y)
+      end = this.checkendSync()
+    }
+  }
+  aiVsrandom = event =>{
+    this.redrawBoard()
+    let y = {truth:false}
+    let end = false
+    while (!y['truth'] && !end){
+      this.aiMoveClever("cvc", y)
+      this.aiMove("pvc", y)
       end = this.checkendSync()
     }
   }
@@ -714,7 +744,8 @@ class Game extends React.Component {
             <Button className={classes.button} onClick ={this.computerInactive} value={1} key={1}>vs Human</Button>
             <Button className={classes.button} onClick ={this.computerActiveF} value={2} key={2}>vs Computer (Go First)</Button>
             <Button className={classes.button} onClick ={this.computerActiveS} value={2} key={2}>vs Computer (Go Second)</Button>
-            <Button className={classes.button} onClick = {this.computerVscomputer}>Computer vs Computer</Button>
+            <Button className={classes.button} onClick = {this.randomVsrandom}>Random vs Random</Button>
+            <Button className={classes.button} onClick = {this.aiVsrandom}>AI (first) vs Random</Button>
         </div>
       </div>
     );
