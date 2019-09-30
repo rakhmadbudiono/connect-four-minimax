@@ -1,4 +1,4 @@
-const util = require("util");
+const util = require("./util");
 
 function evaluate(board) {
     let score = 0;
@@ -10,11 +10,11 @@ function evaluate(board) {
         if(horizontalBoardString.includes("1,1,1,1")){
             score += 100;
         }else if(horizontalBoardString.includes("2,2,2,2")){
-            score -= 4;
+            score -= 80;
         }else if(horizontalBoardString.includes("1,1,1")){
             score += 20;
         }else if(horizontalBoardString.includes("1,1")){
-            score += 10;
+            score += 5;
         }
     }
 
@@ -25,30 +25,16 @@ function evaluate(board) {
         if(verticalBoardString.includes("1,1,1,1")){
             score += 100;
         }else if(verticalBoardString.includes("2,2,2,2")){
-            score -= 4;
+            score -= 80;
         }else if(verticalBoardString.includes("1,1,1")){
             score += 20;
         }else if(verticalBoardString.includes("1,1")){
-            score += 10;
+            score += 5;
         }
     }
 
     return score;
 }
-
-// function countPiece(board, pieceType) {
-//     let count = 0;
-    
-//     for(let i = 0; i<7; i++){
-//         for(let j = 0; j<6; j++){
-//             if(board[i][j] === pieceType) {
-//                 count++;
-//             }
-//         }
-//     }
-
-//     return count;
-// }
 
 module.exports = {
     evaluate
