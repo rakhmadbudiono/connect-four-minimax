@@ -7,13 +7,15 @@ function evaluate(board) {
     for(let i = 0; i < 6; i++) {
         let horizontalBoardString = board[i].toString();
 
-        if(horizontalBoardString.includes("1,1,1,1")){
+        if(horizontalBoardString.includes("2,2,2,2")){
             score += 100;
-        }else if(horizontalBoardString.includes("2,2,2,2")){
+        }else if(horizontalBoardString.includes("1,1,1,1")){
             score -= 80;
         }else if(horizontalBoardString.includes("1,1,1")){
             score += 20;
-        }else if(horizontalBoardString.includes("1,1")){
+        }else if(horizontalBoardString.includes("2,2,2")){
+            score += 20;
+        }else if(horizontalBoardString.includes("2,2")){
             score += 5;
         }
     }
@@ -22,13 +24,15 @@ function evaluate(board) {
     for(let i = 0; i < 7; i++) {
         let verticalBoardString = util.getVerticalBoard(board, i).toString();
 
-        if(verticalBoardString.includes("1,1,1,1")){
+        if(verticalBoardString.includes("2,2,2,2")){
             score += 100;
-        }else if(verticalBoardString.includes("2,2,2,2")){
+        }else if(verticalBoardString.includes("1,1,1,1")){
             score -= 80;
         }else if(verticalBoardString.includes("1,1,1")){
             score += 20;
-        }else if(verticalBoardString.includes("1,1")){
+        }else if(verticalBoardString.includes("2,2,2")){
+            score += 20;
+        }else if(verticalBoardString.includes("2,2")){
             score += 5;
         }
     }

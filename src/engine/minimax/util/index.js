@@ -1,14 +1,14 @@
 const _ = require("lodash");
 
-function generateNextBoard(lastBoard, move, isPlayerTurn) {
+function generateNextBoard(lastBoard, move, isComputerTurn) {
     for(let i = 5; i>-1; i--) {
         if(lastBoard[i][move] === 0){
             let board = _.cloneDeep(lastBoard);
 
-            if(isPlayerTurn){
-                board[i][move] = 1;
-            } else {
+            if(isComputerTurn){
                 board[i][move] = 2;
+            } else {
+                board[i][move] = 1;
             }
 
             return board;
@@ -73,9 +73,14 @@ function getWinner(board) {
   return 0;
 }
 
+function randomMove(){
+  return Math.floor(Math.random() * Math.floor(7));
+}
+
 module.exports = {
     getVerticalBoard,
     getAllPossibleStates,
     generateNextBoard,
-    getWinner
+    getWinner,
+    randomMove
 }
