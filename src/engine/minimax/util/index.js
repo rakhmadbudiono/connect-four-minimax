@@ -26,6 +26,24 @@ function getVerticalBoard(board, i){
     return verticalBoard;
 }
 
+
+
+function getDiagonalPositiveAboveBoard(board, i){
+  let diagonalBoard = [];
+  let k = i;
+
+  for(let j = 0; j < 6; j++){
+      if (k < 0) {
+        break;
+      }
+
+      diagonalBoard.push(board[j][k]);
+      k--;
+  }
+
+  return diagonalBoard;
+}
+
 function getDiagonalPositiveBelowBoard(board, i){
   let diagonalBoard = [];
 
@@ -65,22 +83,6 @@ function getDiagonalNegativeBelowBoard(board, i){
 
       diagonalBoard.push(board[j][k]);
       k--;
-  }
-
-  return diagonalBoard;
-}
-
-function getDiagonalPositiveAboveBoard(board, i){
-  let diagonalBoard = [];
-  let k = i;
-
-  for(let j = 0; j < 6; j++){
-      if (k > 6) {
-        break;
-      }
-
-      diagonalBoard.push(board[j][k]);
-      k++;
   }
 
   return diagonalBoard;
