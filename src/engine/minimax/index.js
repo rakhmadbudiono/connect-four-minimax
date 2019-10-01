@@ -8,12 +8,15 @@ function max(states, depth, alpha, beta) {
     let move = util.randomMove();
   
     for (let i = 0; i < states.length; i++) {
-      comparedScore = minimax(states[i].board, depth - 1, alpha, beta, false).score;
+      console.log(states[i]);
+      comparedScore = minimax(states[i].board, depth - 1, alpha, beta, true).score;
   
       if (comparedScore > score) {
         score = comparedScore;
         move = states[i].move;
       }
+
+      console.log("max", score);
   
       //prunning
       if (alpha < score) {
@@ -35,11 +38,13 @@ function min(states, depth, alpha, beta) {
   let move = util.randomMove();
 
   for (let i = 0; i < states.length; i++)  {
-    comparedScore = minimax(states[i].board, depth - 1, alpha, beta, true).score;
+    comparedScore = minimax(states[i].board, depth - 1, alpha, beta, false).score;
     if (comparedScore < score) {
       score = comparedScore;
       move = states[i].move;
     }
+
+    console.log("min", score);
 
     //prunning
     if (alpha > score) {
@@ -55,22 +60,19 @@ function min(states, depth, alpha, beta) {
 }
 
 function minimax(board, depth, alpha, beta, isPlayerTurn) {
-  const possibleStates = util.getAllPossibleStates(board);
-  const winCondition = util.getWinner(board);
-
-    if (winCondition !== 0) {
-
+  let possibleStates = util.getAllPossibleStates(board, isPlayerTurn);
+  let winCondition = util.getWinner(board);
+  
+    if (winCondition !== 0 || depth === 0) {
+      
       return { move: -1, score: evaluate(board) };
     } else {
-      if (depth === 0) {
-
-        return { move: -1, score: evaluate(board) };
-      } else if (isPlayerTurn) {
-
-        return max(possibleStates, depth, alpha, beta);
+      if (isPlayerTurn) {
+        
+        return min(possibleStates, depth, alpha, beta);
       } else {
 
-        return min(possibleStates, depth, alpha, beta);
+        return max(possibleStates, depth, alpha, beta);
       }
     }
 }

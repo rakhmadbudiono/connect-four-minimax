@@ -26,7 +26,69 @@ function getVerticalBoard(board, i){
     return verticalBoard;
 }
 
-function getAllPossibleStates(board, isPlayerTurn) {
+
+
+function getDiagonalPositiveAboveBoard(board, i){
+  let diagonalBoard = [];
+  let k = i;
+
+  for(let j = 0; j < 6; j++){
+      if (k < 0) {
+        break;
+      }
+
+      diagonalBoard.push(board[j][k]);
+      k--;
+  }
+
+  return diagonalBoard;
+}
+
+function getDiagonalPositiveBelowBoard(board, i){
+  let diagonalBoard = [];
+
+  for(let j = 0; j < 6; j++){
+      if (i+j > 6) {
+        break;
+      }
+
+      diagonalBoard.push(board[5-j][i+j]);
+  }
+
+  return diagonalBoard;
+}
+
+function getDiagonalNegativeAboveBoard(board, i){
+  let diagonalBoard = [];
+
+  for(let j = 0; j < 6; j++){
+      if (i+j > 6) {
+        break;
+      }
+
+      diagonalBoard.push(board[j][i+j]);
+  }
+
+  return diagonalBoard;
+}
+
+function getDiagonalNegativeBelowBoard(board, i){
+  let diagonalBoard = [];
+  let k = i;
+
+  for(let j = 5; j>-1; j--){
+      if (k < 0) {
+        break;
+      }
+
+      diagonalBoard.push(board[j][k]);
+      k--;
+  }
+
+  return diagonalBoard;
+}
+
+function getAllPossibleStates(board, isTurnPlayer) {
     let possibleStates = [];
     
     for(let i = 0; i < 7; i++){
@@ -37,7 +99,7 @@ function getAllPossibleStates(board, isPlayerTurn) {
 
         if(isLegalMove(board, i)){
           tempState.move = i;
-          tempState.board = generateNextBoard(board, i, isPlayerTurn);
+          tempState.board = generateNextBoard(board, i, !isTurnPlayer);
           possibleStates.push(tempState);
         }
     }
@@ -62,12 +124,32 @@ function getWinner(board) {
 
   for(let i = 0; i < 7; i++){
     let verticalArrayString = getVerticalBoard(board, i).toString();
+    let diagonalPositiveBelowBoard = getDiagonalPositiveBelowBoard(board, i).toString();
+    let diagonalNegativeAboveBoard = getDiagonalNegativeAboveBoard(board, i).toString();
+    let diagonalNegativeBelowBoard = getDiagonalNegativeBelowBoard(board, i).toString();
+    let diagonalPositiveAboveBoard = getDiagonalPositiveAboveBoard(board, i).toString();
 
     if (verticalArrayString.includes("1,1,1,1")) {
       return 1;
     } else if (verticalArrayString.includes("2,2,2,2")){
       return 2;
-    }
+    } else if (diagonalPositiveBelowBoard.includes("1,1,1,1")) {
+      return 1;
+    } else if (diagonalPositiveBelowBoard.includes("2,2,2,2")){
+      return 2;
+    } else if (diagonalNegativeAboveBoard.includes("1,1,1,1")) {
+      return 1;
+    } else if (diagonalNegativeAboveBoard.includes("2,2,2,2")){
+      return 2;
+    } else if (diagonalNegativeBelowBoard.includes("1,1,1,1")) {
+      return 1;
+    } else if (diagonalNegativeBelowBoard.includes("2,2,2,2")){
+      return 2;
+    } else if (diagonalPositiveAboveBoard.includes("1,1,1,1")) {
+      return 1;
+    } else if (diagonalPositiveAboveBoard.includes("2,2,2,2")){
+      return 2;
+    } 
   }
 
   return 0;
@@ -79,6 +161,10 @@ function randomMove(){
 
 module.exports = {
     getVerticalBoard,
+    getDiagonalPositiveBelowBoard,
+    getDiagonalPositiveAboveBoard,
+    getDiagonalNegativeAboveBoard,
+    getDiagonalNegativeBelowBoard,
     getAllPossibleStates,
     generateNextBoard,
     getWinner,
