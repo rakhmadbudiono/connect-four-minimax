@@ -86,7 +86,7 @@ function getDiagonalPositiveAboveBoard(board, i){
   return diagonalBoard;
 }
 
-function getAllPossibleStates(board, isPlayerTurn) {
+function getAllPossibleStates(board, isTurnPlayer) {
     let possibleStates = [];
     
     for(let i = 0; i < 7; i++){
@@ -97,7 +97,7 @@ function getAllPossibleStates(board, isPlayerTurn) {
 
         if(isLegalMove(board, i)){
           tempState.move = i;
-          tempState.board = generateNextBoard(board, i, isPlayerTurn);
+          tempState.board = generateNextBoard(board, i, !isTurnPlayer);
           possibleStates.push(tempState);
         }
     }
