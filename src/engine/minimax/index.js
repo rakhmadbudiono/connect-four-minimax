@@ -8,15 +8,12 @@ function max(states, depth, alpha, beta) {
     let move = util.randomMove();
   
     for (let i = 0; i < states.length; i++) {
-      console.log(states[i]);
       comparedScore = minimax(states[i].board, depth - 1, alpha, beta, true).score;
   
       if (comparedScore > score) {
         score = comparedScore;
         move = states[i].move;
       }
-
-      console.log("max", score);
   
       //prunning
       if (alpha < score) {
@@ -43,8 +40,6 @@ function min(states, depth, alpha, beta) {
       score = comparedScore;
       move = states[i].move;
     }
-
-    console.log("min", score);
 
     //prunning
     if (alpha > score) {
