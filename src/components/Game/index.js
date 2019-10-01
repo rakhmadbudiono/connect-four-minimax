@@ -284,9 +284,8 @@ class Game extends React.Component {
     const {classes} = this.props;
     let {turn} = this.state
     let i;
-    console.log(minimax(board, 18, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false))
-    console.log(board)
     
+      console.log(board)
       if (this.checkendSync() == 0){
         for (i = 0; i < 6; i++) {
           if (board[i][x] == "1" || board[i][x] == "2") {
@@ -372,7 +371,15 @@ class Game extends React.Component {
 
   aiMoveClever = (x,y) =>{
     const {board} = this.state
-    let obj = minimax(board, 18, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false)
+    let numboard = [[], [], [], [], [], []]
+    for (let i = 0; i < 6; i++){
+      for (let j = 0; j < 7; j++){
+        numboard[i].push(parseInt(board[i][j]))
+      }
+    }
+    let obj = minimax(numboard, 5, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false)
+    console.log(board)
+    console.log(numboard)
     if (y != null){
       y['truth'] = true
     }
@@ -541,6 +548,7 @@ class Game extends React.Component {
     this.redrawBoard()
     this.setState({
       vsComp:true,
+      vsCleverComp:false
     })
   }
 
@@ -549,6 +557,7 @@ class Game extends React.Component {
     this.aiMove("pvc")
     this.setState({
       vsComp:true,
+      vsCleverComp:false
     })
   }
 
@@ -597,18 +606,21 @@ class Game extends React.Component {
     this.aiMoveClever("pvc")
     this.setState({
       vsCleverComp:true,
+      vsComp:false
     })
   }
   humanVsai = event =>{
     this.redrawBoard()
     this.setState({
       vsCleverComp:true,
+      vsComp:false
     })
   }
   computerInactive = event => {
     this.redrawBoard()
     this.setState({
-      vsComp:false
+      vsComp:false,
+      vsCleverComp:false,
     })
   }
 

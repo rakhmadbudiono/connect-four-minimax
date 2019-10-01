@@ -14,6 +14,8 @@ function max(states, depth, alpha, beta) {
         score = comparedScore;
         move = states[i].move;
       }
+
+      console.log("max", score);
   
       //prunning
       if (alpha < score) {
@@ -40,6 +42,8 @@ function min(states, depth, alpha, beta) {
       score = comparedScore;
       move = states[i].move;
     }
+
+    console.log("min", score);
 
     //prunning
     if (alpha > score) {
