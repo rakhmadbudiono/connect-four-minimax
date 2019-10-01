@@ -2,10 +2,11 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
+const { minimax } = require("../../engine/minimax/index");
 
 const styles = {
   root: {
-    maxWidth: "800px",
+    maxWidth: "700px",
     margin: "20px auto 20px auto",
     backgroundColor: "blue",
     borderRadius:"10px",
@@ -13,20 +14,20 @@ const styles = {
   wCircles: {
     backgroundColor: "white",
     borderRadius: "50%",
-    minWidth: "100px",
-    minHeight: "100px"
+    minWidth: "60px",
+    minHeight: "60px"
   },
   rCircles: {
     backgroundColor: "red",
     borderRadius: "50%",
-    minWidth: "100px",
-    minHeight: "100px"
+    minWidth: "60px",
+    minHeight: "60px"
   },
   yCircles: {
     backgroundColor: "yellow",
     borderRadius: "50%",
-    minWidth: "100px",
-    minHeight: "100px"
+    minWidth: "60px",
+    minHeight: "60px"
   },
   row: {
     margin: "10px"
@@ -36,14 +37,13 @@ const styles = {
     fontSize:"32px"
   },
   playsetting:{
-    display:"flex",
-    flexDirection:"row",
-    maxWidth:"600px",
+    maxWidth:"1000px",
     margin:"auto"
   },
   button:{
     margin:"8px",
     backgroundColor:"grey",
+    padding: "20px",
     color:"white",
     '&:hover':{
       backgroundColor:"grey"
@@ -73,6 +73,7 @@ class Game extends React.Component {
       lock:false,
       win:null,
       vsComp:false,
+      vsCleverComp:false
     };
   }
 
@@ -222,7 +223,7 @@ class Game extends React.Component {
     let finish = true
     const {board} = this.state
     for (let i = 0; i < 6; i++){
-        if (board[i][0] == "0"){
+        if (board[0][i] == "0"){
           finish = false
           break
         }
@@ -262,7 +263,7 @@ class Game extends React.Component {
     let finish = true
     const {board} = this.state
     for (let i = 0; i < 6; i++){
-        if (board[i][0] == "0"){
+        if (board[0][i] == "0"){
           finish = false
           break
         }
@@ -283,7 +284,9 @@ class Game extends React.Component {
     const {classes} = this.props;
     let {turn} = this.state
     let i;
-
+    console.log(minimax(board, 18, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false))
+    console.log(board)
+    
       if (this.checkendSync() == 0){
         for (i = 0; i < 6; i++) {
           if (board[i][x] == "1" || board[i][x] == "2") {
@@ -300,6 +303,8 @@ class Game extends React.Component {
               break;
             }else if (turn == 1){
               if (y == "pvc"){
+                console.log(i)
+                console.log(x)
                 board[i - 1][x] = "2";
                 matRend[i-1][x] = (<Grid key={6*(i+1)+x+1} className={classes.rCircles} item />)
                 turn = 1;
@@ -364,6 +369,27 @@ class Game extends React.Component {
       }
     }
   }
+
+  aiMoveClever = (x,y) =>{
+    const {board} = this.state
+    let obj = minimax(board, 18, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, false)
+    if (y != null){
+      y['truth'] = true
+    }
+    for (let i = 0; i < 7; i++){
+      if (y != null){
+        if (board[0][i] == "0"){
+          y['truth'] = false
+          break
+        }
+      }
+    }
+    if (x === "pvc"){
+      this.adversarialMove(obj['move'], "pvc")
+    }else if (x === "cvc"){
+      this.adversarialMove(obj['move'], "cvc")
+    }
+  }
   
   clickCol = event => {
     const { board } = this.state;
@@ -407,6 +433,8 @@ class Game extends React.Component {
         this.checkend()
         if (this.state.vsComp){
           this.aiMove("pvc")
+        }else if (this.state.vsCleverComp){
+          this.aiMoveClever("pvc")
         }
       }
     }
@@ -423,7 +451,6 @@ class Game extends React.Component {
         board[i][j] = "0"
         counter += 1
         let key = counter
-        console.log(key)
         switch(j){         
           case 0:
             matRend[i][j] = (
@@ -525,7 +552,7 @@ class Game extends React.Component {
     })
   }
 
-  computerVscomputer = event =>{
+  randomVsrandom = event =>{
     this.redrawBoard()
     let y = {truth:false}
     let end = false
@@ -534,6 +561,49 @@ class Game extends React.Component {
       this.aiMove("cvc",y)
       end = this.checkendSync()
     }
+  }
+  aiVsrandom = event =>{
+    this.redrawBoard()
+    let y = {truth:false}
+    let end = false
+    while (!y['truth'] && !end){
+      this.aiMoveClever("cvc", y)
+      this.aiMove("pvc", y)
+      end = this.checkendSync()
+    }
+  }
+  randomVsai = event =>{
+    this.redrawBoard()
+    let y = {truth:false}
+    let end = false
+    while (!y['truth'] && !end){
+      this.aiMove("pvc", y)
+      this.aiMoveClever("cvc", y)
+      end = this.checkendSync()
+    }
+  }
+  aiVsai = event =>{
+    this.redrawBoard()
+    let y = {truth:false}
+    let end = false
+    while (!y['truth'] && !end){
+      this.aiMoveClever("pvc", y)
+      this.aiMoveClever("cvc", y)
+      end = this.checkendSync()
+    }
+  }
+  aiVshuman = event =>{
+    this.redrawBoard()
+    this.aiMoveClever("pvc")
+    this.setState({
+      vsCleverComp:true,
+    })
+  }
+  humanVsai = event =>{
+    this.redrawBoard()
+    this.setState({
+      vsCleverComp:true,
+    })
   }
   computerInactive = event => {
     this.redrawBoard()
@@ -647,7 +717,7 @@ class Game extends React.Component {
       winner = "Permainan seri!"
     }
     if (this.state.end){
-      end = <h1> Game End! Winner is {winner}</h1>
+      end = <h2> Game End! Winner is {winner}</h2>
     }else{
       end = null;
     }
@@ -709,12 +779,17 @@ class Game extends React.Component {
             {matRend[5]}
           </Grid>
         </Grid>
-        <div className={classes.playsetting}>
+        <Grid container direction="row" justify="space-evenly" className={classes.playsetting}>
             <Button className={classes.button} onClick ={this.computerInactive} value={1} key={1}>vs Human</Button>
             <Button className={classes.button} onClick ={this.computerActiveF} value={2} key={2}>vs Computer (Go First)</Button>
             <Button className={classes.button} onClick ={this.computerActiveS} value={2} key={2}>vs Computer (Go Second)</Button>
-            <Button className={classes.button} onClick = {this.computerVscomputer}>Computer vs Computer</Button>
-        </div>
+            <Button className={classes.button} onClick = {this.randomVsrandom}>Random vs Random</Button>
+            <Button className={classes.button} onClick = {this.aiVsrandom}>AI (first) vs Random</Button>
+            <Button className={classes.button} onClick = {this.randomVsai}>AI vs Random (first)</Button>
+            <Button className={classes.button} onClick = {this.aiVsai}>AI vs AI</Button>
+            <Button className={classes.button} onClick = {this.aiVshuman}>AI (first) vs Human</Button>
+            <Button className={classes.button} onClick = {this.humanVsai}>AI vs Human (first)</Button>
+        </Grid>
       </div>
     );
   }
